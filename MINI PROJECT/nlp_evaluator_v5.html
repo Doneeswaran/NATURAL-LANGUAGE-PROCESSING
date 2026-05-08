@@ -1,0 +1,301 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+  --color-background-info: #eff6ff;
+  --color-background-success: #f0fdf4;
+  --color-background-warning: #fffbeb;
+  --color-background-danger: #fef2f2;
+  --color-border-primary: #cbd5e1;
+  --color-border-secondary: #e2e8f0;
+  --color-border-tertiary: #f1f5f9;
+  --color-border-info: #bfdbfe;
+  --color-border-success: #bbf7d0;
+  --color-border-warning: #fde68a;
+  --color-border-danger: #fecaca;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94a3b8;
+  --color-text-info: #1d4ed8;
+  --color-text-success: #15803d;
+  --color-text-warning: #b45309;
+  --color-text-danger: #b91c1c;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: #f0f4f8; color: var(--color-text-primary); }
+.app { max-width: 750px; margin: 0 auto; padding: 2rem 1rem; }
+.header { margin-bottom: 1.5rem; }
+.header h1 { font-size: 20px; font-weight: 500; }
+.header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+.panel { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.lbl { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); display: block; margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+.three-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+.upload-zone { border: 1px dashed var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 16px 10px; text-align: center; background: var(--color-background-secondary); }
+.uz-btn { display: inline-block; margin-top: 8px; padding: 6px 14px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+.uz-btn:hover { background: var(--color-background-tertiary); }
+.upload-zone p { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.upload-zone .sub { font-size: 10px; color: var(--color-text-tertiary); }
+.file-preview { display: flex; align-items: center; gap: 8px; padding: 9px 10px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
+.file-icon { width: 28px; height: 28px; border-radius: 5px; background: var(--color-background-info); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 9px; font-weight: 500; color: var(--color-text-info); }
+.file-name { font-size: 12px; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { font-size: 10px; color: var(--color-text-tertiary); }
+.rm-btn { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); font-size: 16px; padding: 0 2px; line-height: 1; }
+.rm-btn:hover { color: var(--color-text-primary); }
+select { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 8px 10px; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-secondary); cursor: pointer; width: 100%; }
+.eval-btn { width: 100%; padding: 11px; font-size: 14px; font-weight: 500; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); cursor: pointer; margin-top: 12px; }
+.eval-btn:hover { opacity: 0.85; }
+.eval-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.score-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1rem; }
+.score-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 8px; text-align: center; }
+.sc-label { font-size: 10px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.sc-val { font-size: 22px; font-weight: 500; line-height: 1; }
+.sc-bar { height: 3px; border-radius: 2px; background: var(--color-border-tertiary); margin-top: 8px; overflow: hidden; }
+.sc-fill { height: 100%; border-radius: 2px; }
+.verdict { padding: 12px 14px; border-radius: var(--border-radius-md); font-size: 14px; margin-bottom: 1rem; border-left: 3px solid; }
+.pass { background: var(--color-background-success); border-color: var(--color-border-success); color: var(--color-text-success); }
+.partial { background: var(--color-background-warning); border-color: var(--color-border-warning); color: var(--color-text-warning); }
+.fail { background: var(--color-background-danger); border-color: var(--color-border-danger); color: var(--color-text-danger); }
+.fb-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }
+.fb-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-secondary); margin-bottom: 10px; }
+.fb-s { margin-bottom: 10px; }
+.fb-s:last-child { margin-bottom: 0; }
+.fb-s h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.fb-s p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.kw { display: inline-block; padding: 2px 8px; margin: 2px; font-size: 11px; border-radius: 4px; }
+.kw-hit { background: var(--color-background-success); color: var(--color-text-success); }
+.kw-miss { background: var(--color-background-danger); color: var(--color-text-danger); }
+.dots { display: inline-flex; gap: 4px; align-items: center; }
+.dots span { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: b 1.2s ease-in-out infinite; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes b { 0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1} }
+.notice { padding: 10px 12px; border-radius: var(--border-radius-md); font-size: 13px; margin-top: 10px; }
+.notice-err { background: var(--color-background-danger); color: var(--color-text-danger); }
+.notice-info { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+</style>
+
+<input type="file" id="qFile"   accept=".pdf,.txt" style="display:none">
+<input type="file" id="refFile" accept=".pdf,.txt" style="display:none">
+<input type="file" id="stuFile" accept=".pdf,.txt" style="display:none">
+
+<div class="app">
+  <div class="header">
+    <h1>NLP Answer Evaluator</h1>
+    <p>Upload documents (PDF or TXT) for question, key answer, and student answer</p>
+  </div>
+
+  <div class="panel">
+    <div class="three-grid">
+      <div>
+        <label class="lbl">① Question</label>
+        <div id="qZone" class="upload-zone">
+          <p>Question paper</p>
+          <p class="sub">PDF · TXT</p>
+          <button class="uz-btn" id="qBtn">Choose file</button>
+        </div>
+        <div id="qPreview" style="display:none;margin-top:8px"></div>
+      </div>
+      <div>
+        <label class="lbl">② Key answer <span style="color:var(--color-text-danger)">*</span></label>
+        <div id="refZone" class="upload-zone">
+          <p>Reference answer</p>
+          <p class="sub">PDF · TXT</p>
+          <button class="uz-btn" id="refBtn">Choose file</button>
+        </div>
+        <div id="refPreview" style="display:none;margin-top:8px"></div>
+      </div>
+      <div>
+        <label class="lbl">③ Student answer <span style="color:var(--color-text-danger)">*</span></label>
+        <div id="stuZone" class="upload-zone">
+          <p>Student answer</p>
+          <p class="sub">PDF · TXT</p>
+          <button class="uz-btn" id="stuBtn">Choose file</button>
+        </div>
+        <div id="stuPreview" style="display:none;margin-top:8px"></div>
+      </div>
+    </div>
+
+    </div>
+
+    <div style="margin-bottom:0">
+      <label class="lbl">Evaluation mode</label>
+      <select id="mode">
+        <option value="strict">Strict — exact concepts required</option>
+        <option value="balanced" selected>Balanced — partial credit allowed</option>
+        <option value="lenient">Lenient — conceptual understanding</option>
+      </select>
+    </div>
+
+    <div id="notice" style="display:none" class="notice"></div>
+    <button class="eval-btn" id="evalBtn">Evaluate answer</button>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const files = { q: null, ref: null, stu: null };
+
+function getExt(n) { return n.split('.').pop().toLowerCase(); }
+function fmtSize(b) { return b < 1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(1)+'MB'; }
+
+function showNotice(msg, type) {
+  const el = document.getElementById('notice');
+  el.textContent = msg;
+  el.className = 'notice notice-' + type;
+  el.style.display = 'block';
+}
+function hideNotice() { document.getElementById('notice').style.display = 'none'; }
+
+function setupPicker(key) {
+  const input = document.getElementById(key + 'File');
+  document.getElementById(key + 'Btn').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation(); input.click();
+  });
+  input.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    files[key] = file;
+    const ext = getExt(file.name).toUpperCase();
+    document.getElementById(key + 'Zone').style.display = 'none';
+    const prev = document.getElementById(key + 'Preview');
+    prev.style.display = 'block';
+    prev.innerHTML = `<div class="file-preview">
+      <div class="file-icon">${ext}</div>
+      <div style="flex:1;min-width:0">
+        <div class="file-name">${file.name}</div>
+        <div class="file-size">${fmtSize(file.size)}</div>
+      </div>
+      <button class="rm-btn" data-key="${key}">×</button>
+    </div>`;
+    prev.querySelector('.rm-btn').addEventListener('click', function() {
+      files[key] = null; input.value = '';
+      document.getElementById(key + 'Zone').style.display = 'block';
+      prev.style.display = 'none';
+    });
+    hideNotice();
+  });
+}
+setupPicker('q'); setupPicker('ref'); setupPicker('stu');
+
+async function extractText(file) {
+  const ext = getExt(file.name);
+  if (ext === 'txt') return await file.text();
+  if (ext === 'pdf') {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(s => s.str).join(' ') + '\n';
+    }
+    return text.trim();
+  }
+  throw new Error('Unsupported file type: ' + ext);
+}
+
+function getColor(s) { return s >= 75 ? '#1D9E75' : s >= 50 ? '#BA7517' : '#E24B4A'; }
+
+document.getElementById('evalBtn').addEventListener('click', async function() {
+  hideNotice();
+  if (!files.ref) { showNotice('Please upload the key / reference answer (②).', 'err'); return; }
+  if (!files.stu) { showNotice('Please upload the student answer (③).', 'err'); return; }
+
+  const btn = document.getElementById('evalBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>&nbsp; Extracting text…';
+  document.getElementById('results').innerHTML = '<div class="notice notice-info">Reading documents…</div>';
+
+  try {
+    const [qText, refText, stuText] = await Promise.all([
+      files.q   ? extractText(files.q)   : Promise.resolve(null),
+      extractText(files.ref),
+      extractText(files.stu)
+    ]);
+
+    btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>&nbsp; Evaluating via Local ML Model…';
+    document.getElementById('results').innerHTML = '<div class="notice notice-info">Sending to local ML model for evaluation…</div>';
+
+    const mode = document.getElementById('mode').value;
+
+    const res = await fetch('http://localhost:8000/evaluate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionText: qText || "",
+        referenceText: refText,
+        studentText: stuText,
+        mode: mode
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`API ${res.status}: Is your local python backend running?`);
+    }
+
+    const data = await res.json();
+    renderResults(data);
+
+  } catch(err) {
+    let msg = err.message;
+    if (msg === 'Failed to fetch') {
+      msg = 'Could not connect to the local ML model. Have you started the Python server? Please run `uvicorn app:app --reload` in your backend folder.';
+    }
+    document.getElementById('results').innerHTML = `<div class="verdict fail" style="border-radius:var(--border-radius-md)">Error: ${msg}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Evaluate answer';
+});
+
+function renderResults(d) {
+  const dims = [
+    {key:'semantic',label:'Semantic'},{key:'factual',label:'Factual'},
+    {key:'completeness',label:'Complete'},{key:'clarity',label:'Clarity'},{key:'relevance',label:'Relevance'}
+  ];
+  const cards = dims.map(({key,label}) => {
+    const s = Math.round(d.scores[key]), c = getColor(s);
+    return `<div class="score-card"><div class="sc-label">${label}</div><div class="sc-val" style="color:${c}">${s}</div><div class="sc-bar"><div class="sc-fill" style="width:${s}%;background:${c}"></div></div></div>`;
+  }).join('');
+
+  const overall = Math.round(d.overall), oc = getColor(overall);
+  const vd = overall >= 75
+    ? {cls:'pass', text:'Strong answer — solid understanding with good coverage of key concepts.'}
+    : overall >= 50
+    ? {cls:'partial', text:'Partial answer — covers some aspects but misses important concepts or depth.'}
+    : {cls:'fail', text:'Insufficient answer — does not adequately address the question or key concepts.'};
+
+  const kwHit  = (d.keywords_matched||[]).map(k=>`<span class="kw kw-hit">${k}</span>`).join('');
+  const kwMiss = (d.keywords_missed||[]).map(k=>`<span class="kw kw-miss">${k}</span>`).join('');
+
+  document.getElementById('results').innerHTML = `<div class="panel" style="border-color:${oc}40">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <span style="font-size:13px;color:var(--color-text-secondary)">Overall score</span>
+      <span style="font-size:32px;font-weight:500;color:${oc}">${overall}<span style="font-size:16px;color:var(--color-text-secondary)">/100</span></span>
+    </div>
+    <div class="score-grid">${cards}</div>
+    <div class="verdict ${vd.cls}">${vd.text}</div>
+    <div class="fb-panel">
+      <div class="fb-title">Detailed feedback</div>
+      <div class="fb-s"><h4>Strengths</h4><p>${d.strengths}</p></div>
+      <div class="fb-s"><h4>Gaps &amp; issues</h4><p>${d.gaps}</p></div>
+      <div class="fb-s"><h4>Suggestion</h4><p>${d.suggestion}</p></div>
+      ${kwHit  ? `<div class="fb-s"><h4>Keywords matched</h4><div style="margin-top:4px">${kwHit}</div></div>` : ''}
+      ${kwMiss ? `<div class="fb-s"><h4>Keywords missed</h4><div style="margin-top:4px">${kwMiss}</div></div>` : ''}
+    </div>
+  </div>`;
+  document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
